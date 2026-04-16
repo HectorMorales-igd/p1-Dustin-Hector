@@ -1,0 +1,18 @@
+# IntelliJ IDEA
+.idea/
+*.iws
+*.iml
+*.ipr
+out/
+
+# Compiled Java
+*.class
+
+# Base de dades generada localment
+videogamesDB.dat
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
