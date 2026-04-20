@@ -2,7 +2,7 @@
 
 ## Membres del grup
 - Héctor Morales Viñolo
-- Dustin [cognoms]
+- Dustin Sanchez Rodriguez
 
 ## Descripció
 Adaptació d'una aplicació local de base de dades de videojocs a un model **client-servidor** mitjançant sockets Java.
