@@ -74,6 +74,18 @@ public class Server {
                     System.out.println("Client " + socket.getRemoteSocketAddress() + " opció " + option);
 
                     switch (option) {
+                        case 1:
+                            handleListTitles(out);
+                            break;
+                        case 2:
+                            handleInfoFromOneVideoGame(in, out);
+                            break;
+                        case 3:
+                            handleAddVideoGame(in, out);
+                            break;
+                        case 4:
+                            handleDeleteVideoGame(in, out);
+                            break;
                         case 5:
                             fi = true;
                             break;
@@ -93,6 +105,56 @@ public class Server {
                 closeQuietly(socket);
                 System.out.println("Client desconnectat: " + socket.getRemoteSocketAddress());
             }
+        }
+
+        private void handleListTitles(DataOutputStream out) throws IOException {
+            int num = videoGamesDB.getNumVideoGames();
+
+            out.writeInt(num);
+
+            for (int i = 0; i < num; i++) {
+                VideoGameInfo vgi = videoGamesDB.readVideoGameInfo(i);
+                out.writeUTF(vgi.getTitle());
+            }
+
+            out.flush();
+        }
+
+        private void handleInfoFromOneVideoGame(DataInputStream in, DataOutputStream out) throws IOException {
+            String pattern = in.readUTF();
+
+            int index = videoGamesDB.searchVideoGame(pattern);
+
+            if (index < 0) {
+                out.writeBoolean(false);
+            } else {
+                VideoGameInfo vgi = videoGamesDB.readVideoGameInfo(index);
+                byte[] record = vgi.toBytes();
+                out.writeBoolean(true);
+                out.write(record);
+            }
+
+            out.flush();
+        }
+
+        private void handleAddVideoGame(DataInputStream in, DataOutputStream out) throws IOException {
+            byte[] record = new byte[VideoGameInfo.SIZE];
+            in.readFully(record);
+
+            VideoGameInfo vgi = VideoGameInfo.fromBytes(record);
+            boolean success = videoGamesDB.insertVideoGame(vgi);
+
+            out.writeBoolean(success);
+            out.flush();
+        }
+
+        private void handleDeleteVideoGame(DataInputStream in, DataOutputStream out) throws IOException {
+            String pattern = in.readUTF();
+
+            boolean success = videoGamesDB.deleteVideoGame(pattern);
+
+            out.writeBoolean(success);
+            out.flush();
         }
 
         private void closeQuietly(AutoCloseable c) {
