@@ -44,18 +44,20 @@ public class Client {
 
                                 switch (option) {
                                         case 1:
-                                                System.out.println("Has triat l'opció 1.");
+                                                handleListTitles(out, in);
                                                 break;
                                         case 2:
-                                                System.out.println("Has triat l'opció 2.");
+                                                handleShowGameInfo(console, out, in);
                                                 break;
                                         case 3:
-                                                System.out.println("Has triat l'opció 3.");
+                                                handleAddVideoGame(console, out, in);
                                                 break;
                                         case 4:
-                                                System.out.println("Has triat l'opció 4.");
+                                                handleDeleteVideoGame(console, out, in);
                                                 break;
                                         case 5:
+                                                out.writeInt(5);
+                                                out.flush();
                                                 exit = true;
                                                 break;
                                         default:
