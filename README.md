@@ -12,6 +12,12 @@ El servidor gestiona la base de dades (`videogamesDB.dat`) i el client s'hi conn
 ## Estratègia implementada
 **Servidor concurrent** amb `synchronized` per a l'accés a la base de dades, permetent múltiples clients simultanis.
 
+## Detalls d’implementació
+
+- El servidor crea un únic objecte `VideoGamesDB` compartit entre tots els clients, amb accés sincronitzat (`synchronized`) per evitar condicions de carrera.
+- Cada client es gestiona en un fil separat (`ClientHandler`), mantenint la connexió oberta fins que l’usuari tria l’opció 5.
+- El client utilitza `DataInputStream`/`DataOutputStream` i el format fix `VideoGameInfo.SIZE` per enviar i rebre la informació dels videojocs.
+
 ## Estructura del projecte
 ```
 p1-Dustin-Hector/
@@ -28,26 +34,6 @@ p1-Dustin-Hector/
 ├── .gitignore
 └── README.md
 ```
-
-## Com executar
-
-### 1. Generar la base de dades (només al servidor)
-```bash
-javac src/GenerateVideoGamesDB.java
-java -cp src GenerateVideoGamesDB
-```
-
-### 2. Arrancar el servidor
-```bash
-javac src/*.java
-java -cp src Server 12345
-```
-
-### 3. Connectar el client
-```bash
-java -cp src Client localhost 12345
-```
-
 ## Opcions del menú
 | Opció | Descripció |
 |-------|------------|
