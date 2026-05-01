@@ -96,7 +96,7 @@ public class Server {
                 }
 
             } catch (SocketException | EOFException e) {
-                // client desconnectat
+                // client desconnectat o connexió tallada
             } catch (IOException e) {
                 System.err.println("Error de comunicació amb el client " + socket.getRemoteSocketAddress());
             } finally {
@@ -108,12 +108,18 @@ public class Server {
         }
 
         private void handleListTitles(DataOutputStream out) throws IOException {
-            int num = videoGamesDB.getNumVideoGames();
+            int num;
+            synchronized (videoGamesDB) {
+                num = videoGamesDB.getNumVideoGames();
+            }
 
             out.writeInt(num);
 
             for (int i = 0; i < num; i++) {
-                VideoGameInfo vgi = videoGamesDB.readVideoGameInfo(i);
+                VideoGameInfo vgi;
+                synchronized (videoGamesDB) {
+                    vgi = videoGamesDB.readVideoGameInfo(i);
+                }
                 out.writeUTF(vgi.getTitle());
             }
 
@@ -123,12 +129,18 @@ public class Server {
         private void handleInfoFromOneVideoGame(DataInputStream in, DataOutputStream out) throws IOException {
             String pattern = in.readUTF();
 
-            int index = videoGamesDB.searchVideoGame(pattern);
+            int index;
+            synchronized (videoGamesDB) {
+                index = videoGamesDB.searchVideoGame(pattern);
+            }
 
             if (index < 0) {
                 out.writeBoolean(false);
             } else {
-                VideoGameInfo vgi = videoGamesDB.readVideoGameInfo(index);
+                VideoGameInfo vgi;
+                synchronized (videoGamesDB) {
+                    vgi = videoGamesDB.readVideoGameInfo(index);
+                }
                 byte[] record = vgi.toBytes();
                 out.writeBoolean(true);
                 out.write(record);
@@ -142,7 +154,11 @@ public class Server {
             in.readFully(record);
 
             VideoGameInfo vgi = VideoGameInfo.fromBytes(record);
-            boolean success = videoGamesDB.insertVideoGame(vgi);
+
+            boolean success;
+            synchronized (videoGamesDB) {
+                success = videoGamesDB.insertVideoGame(vgi);
+            }
 
             out.writeBoolean(success);
             out.flush();
@@ -151,7 +167,10 @@ public class Server {
         private void handleDeleteVideoGame(DataInputStream in, DataOutputStream out) throws IOException {
             String pattern = in.readUTF();
 
-            boolean success = videoGamesDB.deleteVideoGame(pattern);
+            boolean success;
+            synchronized (videoGamesDB) {
+                success = videoGamesDB.deleteVideoGame(pattern);
+            }
 
             out.writeBoolean(success);
             out.flush();
