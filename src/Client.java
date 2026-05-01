@@ -8,6 +8,7 @@ import java.net.Socket;
 public class Client {
         private static final String DEFAULT_HOST = "localhost";
         private static final int DEFAULT_PORT = 12345;
+
         public static void main(String[] args) {
                 String host = DEFAULT_HOST;
                 int port = DEFAULT_PORT;
@@ -105,6 +106,25 @@ public class Client {
                         } catch (NumberFormatException e) {
                                 System.out.println("Opció no vàlida. Introdueix un número del 1 al 5.");
                         }
+                }
+        }
+
+        private String readNonEmptyLine(BufferedReader console, String prompt) throws IOException {
+                for (;;) {
+                        System.out.println(prompt);
+                        String line = console.readLine();
+
+                        if (line == null) {
+                                return "";
+                        }
+
+                        line = line.trim();
+
+                        if (!line.isEmpty()) {
+                                return line;
+                        }
+
+                        System.out.println("El camp no pot ser buit.");
                 }
         }
 }
