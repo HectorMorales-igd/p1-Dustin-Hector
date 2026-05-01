@@ -20,7 +20,35 @@ public class Client {
                      DataOutputStream out = new DataOutputStream(socket.getOutputStream());
                      BufferedReader console = new BufferedReader(new InputStreamReader(System.in))) {
 
-                        printMenu();
+                        boolean exit = false;
+
+                        while (!exit) {
+                                printMenu();
+                                int option = readMenuOption(console);
+
+                                switch (option) {
+                                        case 1:
+                                                System.out.println("Has triat l'opció 1.");
+                                                break;
+                                        case 2:
+                                                System.out.println("Has triat l'opció 2.");
+                                                break;
+                                        case 3:
+                                                System.out.println("Has triat l'opció 3.");
+                                                break;
+                                        case 4:
+                                                System.out.println("Has triat l'opció 4.");
+                                                break;
+                                        case 5:
+                                                exit = true;
+                                                break;
+                                        default:
+                                                System.out.println("Opció no vàlida.");
+                                                break;
+                                }
+
+                                System.out.println();
+                        }
 
                 } catch (IOException e) {
                         System.out.println("Impossible connectar amb el servidor.");
@@ -34,5 +62,34 @@ public class Client {
                 System.out.println("3 - Afegeix un videojoc.");
                 System.out.println("4 - Elimina un videojoc.");
                 System.out.println("5 - Sortir.");
+        }
+
+        private int readMenuOption(BufferedReader console) throws IOException {
+                for (;;) {
+                        System.out.println("Escull una opció: ");
+                        String line = console.readLine();
+
+                        if (line == null) {
+                                return 5;
+                        }
+
+                        line = line.trim();
+
+                        if (line.isEmpty()) {
+                                System.out.println("Opció buida, torna-ho a provar.");
+                                continue;
+                        }
+
+                        try {
+                                int option = Integer.parseInt(line);
+                                if (option >= 1 && option <= 5) {
+                                        return option;
+                                } else {
+                                        System.out.println("Opció no vàlida. Introdueix un número del 1 al 5.");
+                                }
+                        } catch (NumberFormatException e) {
+                                System.out.println("Opció no vàlida. Introdueix un número del 1 al 5.");
+                        }
+                }
         }
 }
