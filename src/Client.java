@@ -127,4 +127,139 @@ public class Client {
                         System.out.println("El camp no pot ser buit.");
                 }
         }
+        private void handleListTitles(DataOutputStream out, DataInputStream in) throws IOException {
+                out.writeInt(1);
+                out.flush();
+
+                int numVideoGames = in.readInt();
+
+                if (numVideoGames <= 0) {
+                        System.out.println();
+                        System.out.println("No hi ha videojocs a la base de dades.");
+                        return;
+                }
+
+                System.out.println();
+                System.out.println("Llista de títols:");
+
+                for (int i = 0; i < numVideoGames; i++) {
+                        String title = in.readUTF();
+                        System.out.println(title);
+                }
+        }
+
+        private void handleShowGameInfo(BufferedReader console,
+                                        DataOutputStream out,
+                                        DataInputStream in) throws IOException {
+                String query = readNonEmptyLine(console,
+                        "Escriu títol o part del títol del videojoc: ");
+
+                out.writeInt(2);
+                out.writeUTF(query);
+                out.flush();
+
+                boolean found = in.readBoolean();
+
+                if (!found) {
+                        System.out.println("Videojoc no trobat.");
+                        return;
+                }
+
+                byte[] record = new byte[VideoGameInfo.SIZE];
+                in.readFully(record);
+
+                VideoGameInfo vgi = VideoGameInfo.fromBytes(record);
+                System.out.println(vgi.toString());
+        }
+
+        private void handleAddVideoGame(BufferedReader console,
+                                        DataOutputStream out,
+                                        DataInputStream in) throws IOException {
+                System.out.println("Escriu el títol del videojoc a afegir: ");
+                String title = console.readLine();
+
+                while (title == null || title.trim().isEmpty()) {
+                        System.out.println("El títol del videojoc no pot ser buit.");
+                        System.out.println("Escriu el títol del videojoc a afegir: ");
+                        title = console.readLine();
+                }
+
+                title = title.trim();
+
+                System.out.println("Escriu la sèrie a la que pertany: ");
+                String series = console.readLine();
+                if (series == null) {
+                        series = "";
+                } else {
+                        series = series.trim();
+                }
+
+                System.out.println("Escriu l'editor del videojoc: ");
+                String publisher = console.readLine();
+                if (publisher == null) {
+                        publisher = "";
+                } else {
+                        publisher = publisher.trim();
+                }
+
+                System.out.println("Introdueix l'any de publicació: ");
+                short year = -1;
+                String yearStr = console.readLine();
+                if (yearStr == null) {
+                        yearStr = "";
+                } else {
+                        yearStr = yearStr.trim();
+                }
+                try {
+                        year = Short.parseShort(yearStr);
+                } catch (NumberFormatException nfe) {
+                }
+
+                System.out.println("Introdueix la quantitat de vendes: ");
+                int sales = -1;
+                String salesStr = console.readLine();
+                if (salesStr == null) {
+                        salesStr = "";
+                } else {
+                        salesStr = salesStr.trim();
+                }
+                try {
+                        sales = Integer.parseInt(salesStr);
+                } catch (NumberFormatException nfe) {
+                }
+
+                VideoGameInfo vgi = new VideoGameInfo(title, series, publisher, year, sales);
+                byte[] record = vgi.toBytes();
+
+                out.writeInt(3);
+                out.write(record);
+                out.flush();
+
+                boolean success = in.readBoolean();
+
+                if (!success) {
+                        System.out.println("Aquest videojoc ja estava a la base de dades.");
+                } else {
+                        System.out.println("Videojoc afegit correctament.");
+                }
+        }
+
+        private void handleDeleteVideoGame(BufferedReader console,
+                                           DataOutputStream out,
+                                           DataInputStream in) throws IOException {
+                String query = readNonEmptyLine(console,
+                        "Escriu títol o part del títol del videojoc: ");
+
+                out.writeInt(4);
+                out.writeUTF(query);
+                out.flush();
+
+                boolean success = in.readBoolean();
+
+                if (!success) {
+                        System.out.println("Videojoc no trobat.");
+                } else {
+                        System.out.println("Videojoc eliminat correctament.");
+                }
+        }
 }
