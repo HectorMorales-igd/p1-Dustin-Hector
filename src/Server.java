@@ -108,23 +108,18 @@ public class Server {
         }
 
         private void handleListTitles(DataOutputStream out) throws IOException {
-            int num;
             synchronized (videoGamesDB) {
-                num = videoGamesDB.getNumVideoGames();
-            }
+                int num = videoGamesDB.getNumVideoGames();
+                out.writeInt(num);
 
-            out.writeInt(num);
-
-            for (int i = 0; i < num; i++) {
-                VideoGameInfo vgi;
-                synchronized (videoGamesDB) {
-                    vgi = videoGamesDB.readVideoGameInfo(i);
+                for (int i = 0; i < num; i++) {
+                    VideoGameInfo vgi = videoGamesDB.readVideoGameInfo(i);
+                    out.writeUTF(vgi.getTitle());
                 }
-                out.writeUTF(vgi.getTitle());
             }
-
             out.flush();
         }
+
 
         private void handleInfoFromOneVideoGame(DataInputStream in, DataOutputStream out) throws IOException {
             String pattern = in.readUTF();
